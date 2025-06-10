@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis dengan Unggah Gambar</title>
+    <style>
+        /* CSS tetap sama seperti sebelumnya */
+        /* ... (CSS dari kode asli) ... */
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .section {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-start {
+            background: linear-gradient(to right, #27ae60, #219653);
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            margin-top: 15px;
+        }
+        
+        .quiz-container {
+            display: none;
+            text-align: center;
+        }
+        
+        .timer {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 15px 0;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+            display: inline-block;
+            min-width: 120px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .question {
+            font-size: 1.4rem;
+            margin: 20px 0;
+            color: #2c3e50;
+            line-height: 1.5;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        @media (min-width: 600px) {
+            .options {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .option {
+            padding: 15px;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option:hover {
+            background-color: #3498db15;
+            transform: translateY(-2px);
+        }
+        
+        .option.selected {
+            background-color: #3498db;
+            color: white;
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .option.selected::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: white;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        .question-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            background: #f9f9f9;
+        }
+        
+        .question-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        
+        .question-item:hover {
+            background-color: #f1f9ff;
+        }
+        
+        .question-item:last-child {
+            border-bottom: none;
+        }
+        
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c0392b;
+            transform: scale(1.1);
+        }
+        
+        .delete-btn::before {
+            content: '✕';
+            font-size: 14px;
+        }
+        
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .wrong {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .timeup {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        
+        .completion {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .completion h2 {
+            color: #27ae60;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .progress-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            gap: 10px;
+        }
+        
+        .progress-text {
+            font-weight: bold;
+            color: #2c3e50;
+            min-width: 80px;
+        }
+        
+        .progress-bar {
+            flex-grow: 1;
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-restart {
+            background: linear-gradient(to right, #27ae60, #219653);
+        }
+        
+        .btn-back {
+            background: linear-gradient(to right, #e67e22, #d35400);
+        }
+        
+        .question-counter {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+        
+        /* Gaya untuk fitur unggah gambar */
+        .image-upload-container {
+            margin: 15px 0;
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            background-color: #f8fafc;
+            transition: all 0.3s;
+        }
+        
+        .image-upload-container:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .image-upload-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .image-upload-input {
+            display: none;
+        }
+        
+        .image-upload-btn {
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            margin: 5px;
+        }
+        
+        .image-upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .image-preview-container {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .image-preview {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e0e0e0;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .remove-image-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(231, 76, 60, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .remove-image-btn:hover {
+            background-color: #c0392b;
+            transform: scale(1.1);
+        }
+        
+        .image-indicator {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .option-image {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .question-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            margin: 0 auto 20px;
+            display: block;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .option.has-image {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .question {
+                font-size: 1.2rem;
+            }
+            
+            .timer {
+                font-size: 2rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .image-preview {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    
+        
+    
+        
+        /* Gaya tambahan untuk perbaikan */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #3498db;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .option-input-container {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .add-option-btn {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .remove-option-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>Kuis dengan Unggah Gambar</h1>
+            <p>Tambahkan gambar ke pertanyaan dan opsi jawaban!</p>
+        </header>
+        
+        <div class="content">
+            <!-- Form untuk menambahkan pertanyaan -->
+            <div class="section" id="question-form-section">
+                <h2 class="section-title">Tambah Pertanyaan Baru</h2>
+                <div class="form-group">
+                    <label for="question">Pertanyaan</label>
+                    <textarea id="question" rows="3" placeholder="Masukkan pertanyaan di sini..."></textarea>
+                    <div class="error-message" id="question-error">Pertanyaan harus diisi!</div>
+                </div>
+                
+                <!-- Unggah gambar untuk pertanyaan -->
+                <div class="image-upload-container">
+                    <label class="image-upload-label">Gambar Pertanyaan (Opsional)</label>
+                    <input type="file" id="question-image" class="image-upload-input" accept="image/*">
+                    <button class="image-upload-btn" onclick="document.getElementById('question-image').click()">Pilih Gambar</button>
+                    <span id="question-image-name"></span>
+                    <div class="image-preview-container" id="question-image-preview"></div>
+                    <div class="error-message" id="question-image-error">Format gambar tidak valid!</div>
+                </div>
+                
+                <!-- Opsi jawaban akan ditambahkan secara dinamis -->
+                <div id="options-container">
+                    <div class="option-input-container">
+                        <label>Opsi Jawaban 1 (Benar)</label>
+                        <input type="text" class="option-input" placeholder="Opsi jawaban pertama (harus jawaban benar)" data-index="0">
+                        <div class="error-message option-error">Opsi harus diisi!</div>
+                        
+                        <div class="image-upload-container">
+                            <label class="image-upload-label">Gambar Opsi 1 (Opsional)</label>
+                            <input type="file" class="option-image-input" accept="image/*" data-index="0">
+                            <button class="image-upload-btn" onclick="document.querySelector('.option-image-input[data-index=\"0\"]').click()">Pilih Gambar</button>
+                            <span class="option-image-name" data-index="0"></span>
+                            <div class="image-preview-container option-image-preview" data-index="0"></div>
+                            <div class="error-message option-image-error">Format gambar tidak valid!</div>
+                        </div>
+                    </div>
+                    
+                    <div class="option-input-container">
+                        <label>Opsi Jawaban 2</label>
+                        <input type="text" class="option-input" placeholder="Opsi jawaban kedua" data-index="1">
+                        <div class="error-message option-error">Opsi harus diisi!</div>
+                        
+                        <div class="image-upload-container">
+                            <label class="image-upload-label">Gambar Opsi 2 (Opsional)</label>
+                            <input type="file" class="option-image-input" accept="image/*" data-index="1">
+                            <button class="image-upload-btn" onclick="document.querySelector('.option-image-input[data-index=\"1\"]').click()">Pilih Gambar</button>
+                            <span class="option-image-name" data-index="1"></span>
+                            <div class="image-preview-container option-image-preview" data-index="1"></div>
+                            <div class="error-message option-image-error">Format gambar tidak valid!</div>
+                        </div>
+                        <button class="remove-option-btn" data-index="1">✕</button>
+                    </div>
+                </div>
+                
+                <button class="add-option-btn" id="add-option-btn">+ Tambah Opsi</button>
+                
+                <div class="form-group">
+                    <label for="time-limit">Waktu Menjawab (detik)</label>
+                    <select id="time-limit">
+                        <option value="5">5 detik</option>
+                        <option value="10" selected>10 detik</option>
+                        <option value="15">15 detik</option>
+                        <option value="20">20 detik</option>
+                        <option value="30">30 detik</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="add-question-btn">Tambahkan Pertanyaan</button>
+                
+                <div class="question-list" id="question-list">
+                    <div class="empty-state">Belum ada pertanyaan. Silakan tambahkan pertanyaan.</div>
+                </div>
+                
+                <button class="btn btn-start" id="start-quiz-btn" disabled>Mulai Kuis!</button>
+            </div>
+            
+            <!-- Area kuis -->
+            <div class="section quiz-container" id="quiz-section">
+                <h2 class="section-title">Kuis Berlangsung</h2>
+                
+                <div class="question-counter" id="question-counter">
+                    Pertanyaan 1 dari 10
+                </div>
+                
+                <div class="timer" id="timer">10</div>
+                
+                <div class="question" id="current-question">
+                    Pertanyaan akan muncul di sini
+                </div>
+                
+                <div class="options" id="quiz-options-container">
+                    <!-- Opsi jawaban akan diisi secara dinamis -->
+                </div>
+                
+                <div class="feedback" id="feedback"></div>
+            </div>
+            
+            <!-- Penyelesaian kuis -->
+            <div class="section completion" id="completion-section">
+                <h2>Kuis Selesai!</h2>
+                <p>Anda telah menyelesaikan semua pertanyaan.</p>
+                
+                <div class="progress-container">
+                    <div class="progress-text">Progress:</div>
+                    <div class="progress-bar">
+                        <div class="progress" id="progress-bar"></div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-restart" id="restart-btn">Mulai Kuis Lagi</button>
+                    <button class="btn btn-back" id="back-to-list-btn">Kembali ke Daftar Pertanyaan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data pertanyaan
+        let questions = JSON.parse(localStorage.getItem('quizQuestions')) || [];
+        let currentQuestionIndex = -1;
+        let timer;
+        let timeLeft;
+        let selectedOption = null;
+        
+        // Elemen DOM
+        const questionFormSection = document.getElementById('question-form-section');
+        const quizSection = document.getElementById('quiz-section');
+        const completionSection = document.getElementById('completion-section');
+        const questionList = document.getElementById('question-list');
+        const startQuizBtn = document.getElementById('start-quiz-btn');
+        const addQuestionBtn = document.getElementById('add-question-btn');
+        const timerDisplay = document.getElementById('timer');
+        const currentQuestionDisplay = document.getElementById('current-question');
+        const quizOptionsContainer = document.getElementById('quiz-options-container');
+        const feedbackDisplay = document.getElementById('feedback');
+        const restartBtn = document.getElementById('restart-btn');
+        const backToListBtn = document.getElementById('back-to-list-btn');
+        const questionCounter = document.getElementById('question-counter');
+        const progressBar = document.getElementById('progress-bar');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const addOptionBtn = document.getElementById('add-option-btn');
+        const optionsContainer = document.getElementById('options-container');
+        
+        // Fungsi untuk menampilkan/menyembunyikan loading
+        function showLoading() {
+            loadingOverlay.style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            loadingOverlay.style.display = 'none';
+        }
+        
+        // Fungsi untuk menampilkan pratinjau gambar dengan penanganan error
+        function previewImage(input, previewContainer, nameDisplay, errorDisplay) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // Validasi jenis file
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validImageTypes.includes(file.type)) {
+                errorDisplay.textContent = 'Format file tidak didukung. Gunakan JPG, PNG, atau GIF.';
+                errorDisplay.style.display = 'block';
+                input.value = '';
+                return;
+            }
+            
+            // Validasi ukuran file (maks 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                errorDisplay.textContent = 'Ukuran file terlalu besar. Maksimal 2MB.';
+                errorDisplay.style.display = 'block';
+                input.value = '';
+                return;
+            }
+            
+            errorDisplay.style.display = 'none';
+            
+            const reader = new FileReader();
+            
+            reader.onloadstart = function() {
+                showLoading();
+            };
+            
+            reader.onload = function(e) {
+                // Hapus pratinjau sebelumnya jika ada
+                previewContainer.innerHTML = '';
+                
+                // Buat elemen gambar
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                
+                // Buat tombol hapus
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-image-btn';
+                removeBtn.innerHTML = '✕';
+                removeBtn.onclick = function() {
+                    previewContainer.innerHTML = '';
+                    input.value = '';
+                    nameDisplay.textContent = '';
+                    errorDisplay.style.display = 'none';
+                };
+                
+                // Buat kontainer pratinjau
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'image-preview';
+                previewDiv.appendChild(img);
+                previewDiv.appendChild(removeBtn);
+                
+                previewContainer.appendChild(previewDiv);
+                nameDisplay.textContent = file.name;
+                hideLoading();
+            };
+            
+            reader.onerror = function() {
+                errorDisplay.textContent = 'Gagal membaca file gambar.';
+                errorDisplay.style.display = 'block';
+                input.value = '';
+                hideLoading();
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        // Event listeners untuk unggah gambar pertanyaan
+        document.getElementById('question-image').addEventListener('change', function() {
+            previewImage(
+                this, 
+                document.getElementById('question-image-preview'), 
+                document.getElementById('question-image-name'),
+                document.getElementById('question-image-error')
+            );
+        });
+        
+        // Event listener untuk menambah opsi baru
+        addOptionBtn.addEventListener('click', () => {
+            const optionIndex = document.querySelectorAll('.option-input-container').length;
+            
+            const optionContainer = document.createElement('div');
+            optionContainer.className = 'option-input-container';
+            
+            optionContainer.innerHTML = `
+                <label>Opsi Jawaban ${optionIndex + 1}</label>
+                <input type="text" class="option-input" placeholder="Opsi jawaban" data-index="${optionIndex}">
+                <div class="error-message option-error">Opsi harus diisi!</div>
+                
+                <div class="image-upload-container">
+                    <label class="image-upload-label">Gambar Opsi (Opsional)</label>
+                    <input type="file" class="option-image-input" accept="image/*" data-index="${optionIndex}">
+                    <button class="image-upload-btn" onclick="document.querySelector('.option-image-input[data-index=\\'${optionIndex}\\']').click()">Pilih Gambar</button>
+                    <span class="option-image-name" data-index="${optionIndex}"></span>
+                    <div class="image-preview-container option-image-preview" data-index="${optionIndex}"></div>
+                    <div class="error-message option-image-error">Format gambar tidak valid!</div>
+                </div>
+                <button class="remove-option-btn" data-index="${optionIndex}">✕</button>
+            `;
+            
+            optionsContainer.appendChild(optionContainer);
+            
+            // Tambahkan event listener untuk input gambar opsi baru
+            optionContainer.querySelector('.option-image-input').addEventListener('change', function() {
+                const index = this.dataset.index;
+                previewImage(
+                    this, 
+                    document.querySelector(`.option-image-preview[data-index="${index}"]`), 
+                    document.querySelector(`.option-image-name[data-index="${index}"]`),
+                    this.parentElement.querySelector('.option-image-error')
+                );
+            });
+            
+            // Tambahkan event listener untuk tombol hapus opsi
+            optionContainer.querySelector('.remove-option-btn').addEventListener('click', function() {
+                // Minimal harus ada 2 opsi
+                if (document.querySelectorAll('.option-input-container').length > 2) {
+                    this.parentElement.remove();
+                    
+                    // Perbarui indeks untuk semua opsi yang tersisa
+                    document.querySelectorAll('.option-input-container').forEach((container, index) => {
+                        container.querySelector('label').textContent = `Opsi Jawaban ${index + 1}${index === 0 ? ' (Benar)' : ''}`;
+                        container.querySelector('.option-input').dataset.index = index;
+                        container.querySelector('.option-image-input').dataset.index = index;
+                        container.querySelector('.option-image-name').dataset.index = index;
+                        container.querySelector('.option-image-preview').dataset.index = index;
+                        container.querySelector('.remove-option-btn').dataset.index = index;
+                    });
+                } else {
+                    alert('Minimal harus ada 2 opsi jawaban!');
+                }
+            });
+        });
+        
+        // Event listeners untuk unggah gambar opsi yang sudah ada
+        document.querySelectorAll('.option-image-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const index = this.dataset.index;
+                previewImage(
+                    this, 
+                    document.querySelector(`.option-image-preview[data-index="${index}"]`), 
+                    document.querySelector(`.option-image-name[data-index="${index}"]`),
+                    this.parentElement.querySelector('.option-image-error')
+                );
+            });
+        });
+        
+        // Event listeners untuk tombol hapus opsi yang sudah ada
+        document.querySelectorAll('.remove-option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Minimal harus ada 2 opsi
+                if (document.querySelectorAll('.option-input-container').length > 2) {
+                    this.parentElement.remove();
+                    
+                    // Perbarui indeks untuk semua opsi yang tersisa
+                    document.querySelectorAll('.option-input-container').forEach((container, index) => {
+                        container.querySelector('label').textContent = `Opsi Jawaban ${index + 1}${index === 0 ? ' (Benar)' : ''}`;
+                        container.querySelector('.option-input').dataset.index = index;
+                        container.querySelector('.option-image-input').dataset.index = index;
+                        container.querySelector('.option-image-name').dataset.index = index;
+                        container.querySelector('.option-image-preview').dataset.index = index;
+                        container.querySelector('.remove-option-btn').dataset.index = index;
+                    });
+                } else {
+                    alert('Minimal harus ada 2 opsi jawaban!');
+                }
+            });
+        });
+        
+        // Simpan pertanyaan ke localStorage
+        function saveQuestions() {
+            localStorage.setItem('quizQuestions', JSON.stringify(questions));
+        }
+        
+        // Fungsi untuk membaca gambar sebagai data URL dengan Promise
+        function readImageAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    resolve(e.target.result);
+                };
+                
+                reader.onerror = function() {
+                    reject(new Error('Gagal membaca file gambar'));
+                };
+                
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // Tambahkan pertanyaan ke dalam daftar
+        addQuestionBtn.addEventListener('click', async () => {
+            // Validasi input
+            const questionText = document.getElementById('question').value.trim();
+            if (!questionText) {
+                document.getElementById('question-error').style.display = 'block';
+                return;
+            } else {
+                document.getElementById('question-error').style.display = 'none';
+            }
+            
+            // Validasi opsi
+            const optionInputs = document.querySelectorAll('.option-input');
+            let hasError = false;
+            
+            optionInputs.forEach((input, index) => {
+                if (!input.value.trim()) {
+                    input.parentElement.querySelector('.option-error').style.display = 'block';
+                    hasError = true;
+                } else {
+                    input.parentElement.querySelector('.option-error').style.display = 'none';
+                }
+            });
+            
+            if (hasError) return;
+            
+            const timeLimit = parseInt(document.getElementById('time-limit').value);
+            
+            try {
+                showLoading();
+                
+                // Dapatkan gambar pertanyaan
+                const questionImageFile = document.getElementById('question-image').files[0];
+                const questionImageData = await readImageAsDataURL(questionImageFile);
+                
+                // Dapatkan opsi dan gambar opsi
+                const options = [];
+                const optionImages = [];
+                
+                for (let i = 0; i < optionInputs.length; i++) {
+                    const optionText = optionInputs[i].value.trim();
+                    options.push(optionText);
+                    
+                    // Dapatkan gambar untuk opsi ini
+                    const optionImageInput = document.querySelector(`.option-image-input[data-index="${i}"]`);
+                    const optionImageFile = optionImageInput ? optionImageInput.files[0] : null;
+                    const optionImageData = await readImageAsDataURL(optionImageFile);
+                    optionImages.push(optionImageData);
+                }
+                
+                // Tambahkan pertanyaan baru
+                questions.push({
+                    question: questionText,
+                    options: options,
+                    images: optionImages,
+                    correctAnswer: options[0], // Opsi pertama dianggap benar
+                    timeLimit: timeLimit,
+                    questionImage: questionImageData
+                });
+                
+                saveQuestions();
+                renderQuestionList();
+                
+                // Reset form
+                document.getElementById('question').value = '';
+                document.getElementById('question-image').value = '';
+                document.getElementById('question-image-preview').innerHTML = '';
+                document.getElementById('question-image-name').textContent = '';
+                document.getElementById('question-image-error').style.display = 'none';
+                
+                // Reset opsi (kembali ke 2 opsi)
+                while (optionsContainer.children.length > 2) {
+                    optionsContainer.removeChild(optionsContainer.lastChild);
+                }
+                
+                // Reset input opsi
+                document.querySelectorAll('.option-input').forEach((input, index) => {
+                    input.value = '';
+                    
+                    const optionImagePreview = document.querySelector(`.option-image-preview[data-index="${index}"]`);
+                    if (optionImagePreview) optionImagePreview.innerHTML = '';
+                    
+                    const optionImageName = document.querySelector(`.option-image-name[data-index="${index}"]`);
+                    if (optionImageName) optionImageName.textContent = '';
+                    
+                    const optionImageError = document.querySelector(`.option-image-input[data-index="${index}"]`).parentElement.querySelector('.option-image-error');
+                    if (optionImageError) optionImageError.style.display = 'none';
+                });
+                
+                document.getElementById('time-limit').value = '10';
+                
+                // Aktifkan tombol mulai kuis
+                startQuizBtn.disabled = false;
+                
+                alert('Pertanyaan berhasil ditambahkan!');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`Terjadi kesalahan: ${error.message}`);
+            } finally {
+                hideLoading();
+            }
+        });
+        
+        // Tampilkan daftar pertanyaan
+        function renderQuestionList() {
+            questionList.innerHTML = '';
+            
+            if (questions.length === 0) {
+                questionList.innerHTML = '<div class="empty-state">Belum ada pertanyaan. Silakan tambahkan pertanyaan.</div>';
+                return;
+            }
+            
+            questions.forEach((q, index) => {
+                const questionItem = document.createElement('div');
+                questionItem.className = 'question-item';
+                
+                const questionText = document.createElement('span');
+                questionText.innerHTML = `<strong>${index + 1}.</strong> ${q.question.substring(0, 50)}${q.question.length > 50 ? '...' : ''}`;
+                
+                // Tambahkan indikator gambar jika ada
+                if (q.questionImage || q.images.some(img => img)) {
+                    const imageIndicator = document.createElement('span');
+                    imageIndicator.className = 'image-indicator';
+                    imageIndicator.textContent = 'Gambar';
+                    questionText.appendChild(imageIndicator);
+                }
+                
+                const infoContainer = document.createElement('div');
+                infoContainer.style.fontSize = '0.8rem';
+                infoContainer.style.color = '#7f8c8d';
+                infoContainer.innerHTML = `
+                    <div>Opsi: ${q.options.length}</div>
+                    <div>Waktu: ${q.timeLimit} detik</div>
+                `;
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    questions.splice(index, 1);
+                    saveQuestions();
+                    renderQuestionList();
+                    if (questions.length === 0) {
+                        startQuizBtn.disabled = true;
+                    }
+                });
+                
+                questionItem.appendChild(questionText);
+                questionItem.appendChild(infoContainer);
+                questionItem.appendChild(deleteBtn);
+                questionList.appendChild(questionItem);
+            });
+        }
+        
+        // Mulai kuis
+        startQuizBtn.addEventListener('click', () => {
+            if (questions.length === 0) {
+                alert('Tambahkan setidaknya satu pertanyaan untuk memulai kuis!');
+                return;
+            }
+            
+            questionFormSection.style.display = 'none';
+            quizSection.style.display = 'block';
+            completionSection.style.display = 'none';
+            
+            currentQuestionIndex = 0;
+            loadQuestion();
+        });
+        
+        // Memuat pertanyaan saat ini
+        function loadQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                showCompletion();
+                return;
+            }
+            
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            // Atur counter pertanyaan
+            questionCounter.textContent = `Pertanyaan ${currentQuestionIndex + 1} dari ${questions.length}`;
+            
+            // Tampilkan pertanyaan
+            let questionHTML = '';
+            
+            // Tampilkan gambar pertanyaan jika ada
+            if (currentQuestion.questionImage) {
+                questionHTML += `<img src="${currentQuestion.questionImage}" class="question-image">`;
+            }
+            
+            questionHTML += `<div>${currentQuestion.question}</div>`;
+            currentQuestionDisplay.innerHTML = questionHTML;
+            
+            // Kosongkan opsi sebelumnya
+            quizOptionsContainer.innerHTML = '';
+            
+            // Tampilkan opsi jawaban
+            currentQuestion.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                
+                let optionContent = '';
+                
+                // Tampilkan gambar opsi jika ada
+                if (currentQuestion.images[index]) {
+                    optionElement.classList.add('has-image');
+                    optionContent += `<img src="${currentQuestion.images[index]}" class="option-image">`;
+                }
+                
+                optionContent += `<div>${option}</div>`;
+                optionElement.innerHTML = optionContent;
+                
+                optionElement.dataset.option = index;
+                optionElement.addEventListener('click', () => selectOption(optionElement, option));
+                quizOptionsContainer.appendChild(optionElement);
+            });
+            
+            // Atur timer
+            timeLeft = currentQuestion.timeLimit;
+            timerDisplay.textContent = timeLeft;
+            
+            // Reset pilihan dan feedback
+            selectedOption = null;
+            feedbackDisplay.style.display = 'none';
+            
+            // Mulai timer
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    timeUp();
+                }
+            }, 1000);
+        }
+        
+        // Pilih opsi jawaban
+        function selectOption(optionElement, option) {
+            if (selectedOption) {
+                selectedOption.classList.remove('selected');
+            }
+            
+            selectedOption = optionElement;
+            selectedOption.classList.add('selected');
+        }
+        
+        // Waktu habis
+        function timeUp() {
+            clearInterval(timer);
+            
+            // Tampilkan feedback
+            feedbackDisplay.textContent = 'Waktu habis! Jawaban benar: ' + questions[currentQuestionIndex].correctAnswer;
+            feedbackDisplay.className = 'feedback timeup';
+            feedbackDisplay.style.display = 'block';
+            
+            // Tampilkan jawaban yang benar
+            const options = quizOptionsContainer.querySelectorAll('.option');
+            options.forEach(opt => {
+                if (opt.textContent.includes(questions[currentQuestionIndex].correctAnswer)) {
+                    opt.classList.add('correct');
+                }
+            });
+            
+            // Lanjut ke pertanyaan berikutnya setelah 3 detik
+            setTimeout(() => {
+                nextQuestion();
+            }, 3000);
+        }
+        
+        // Lanjut ke pertanyaan berikutnya
+        function nextQuestion() {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showCompletion();
+            }
+        }
+        
+        // Tampilkan penyelesaian kuis
+        function showCompletion() {
+            quizSection.style.display = 'none';
+            completionSection.style.display = 'block';
+            
+            // Atur progress bar
+            const progressPercent = 100;
+            progressBar.style.width = `${progressPercent}%`;
+        }
+        
+        // Restart kuis
+        restartBtn.addEventListener('click', () => {
+            currentQuestionIndex = 0;
+            questionFormSection.style.display = 'none';
+            quizSection.style.display = 'block';
+            completionSection.style.display = 'none';
+            loadQuestion();
+        });
+        
+        // Kembali ke daftar pertanyaan
+        backToListBtn.addEventListener('click', () => {
+            completionSection.style.display = 'none';
+            questionFormSection.style.display = 'block';
+        });
+        
+        // Inisialisasi
+        renderQuestionList();
+    </script>
+</body>
+</html>
+
